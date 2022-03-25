@@ -7,7 +7,9 @@
 // Version: 2022mar25
 // License: GPL2
 //
-// (defun e () (interactive) (find-angg "emlua/emlua.cpp"))
+// «.tests-in-tmp»	(to "tests-in-tmp")
+// «.tests-edrx»	(to "tests-edrx")
+
 
 
 #include <vector>
@@ -100,12 +102,44 @@ int emacs_module_init(struct emacs_runtime *ert) noexcept
 
 
 
-// <basic-tests>
+// «tests-in-tmp»  (to ".tests-in-tmp")
+// Download a copy of emlua into /tmp/emlua/
+// and run some tests there.
 /*
+ (eepitch-shell)
+ (eepitch-kill)
+ (eepitch-shell)
+rm -Rfv /tmp/emlua/
+mkdir   /tmp/emlua/
+cd      /tmp/emlua/
+git clone https://github.com/edrx/emlua .
+make clean
+make
+# make EMACS_DIR=$HOME/usrc/emacs29
+
+# (load "/tmp/emlua.so")
+# (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
+# (emlua-dostring "err")
+
+*/
+
+
+// «tests-edrx»  (to ".tests-edrx")
+// Tests that only work in the author's machine.
+/*
+# (find-fline "/tmp/emlua/")
+# (find-fline "~/emlua/")
 
  (eepitch-shell)
  (eepitch-kill)
  (eepitch-shell)
+cd ~/emlua/
+make clean
+make EMACS_DIR=$HOME/usrc/emacs29
+
+# (load (ee-expand "~/emlua/emlua.so"))
+# (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
+# (emlua-dostring "err")
 
 */
 

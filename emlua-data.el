@@ -21,6 +21,13 @@
 ;;
 ;;   (emlua-format "a[%s] = %s"  2.34  "foo")
 ;;        -->    "a[2.34] = [=[foo]=]"
+;;
+;; We can use this to send data to Lua. For example:
+;;
+;;   (emlua-dostring (emlua-format "a,b = %s,%s" 2.34 "foo bar"))
+;;   (emlua-dostring "return a, type(a), b")
+;;        -->          ["2.34" "number" "foo bar"]
+
 
 
 
