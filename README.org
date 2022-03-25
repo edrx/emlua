@@ -1,0 +1,86 @@
+# This file:
+#   https://github.com/edrx/emlua/
+#       http://angg.twu.net/emlua/README.org.html
+#       http://angg.twu.net/emlua/README.org
+#               (find-angg "emlua/README.org")
+#               (find-angg "emlua/")
+# Author: Eduardo Ochs <eduardoochs@gmail.com>
+# 
+# Some eev-isms:
+# (defun c  () (interactive) (eek "C-c C-e h h"))
+# (defun o  () (interactive) (find-angg "emlua/README.org"))
+# (defun v  () (interactive) (brg     "~/emlua/README.html"))
+# (defun cv () (interactive) (c) (v))
+# 
+# (find-mygitrepo-links "emlua")
+# (find-orgnode "Table of Contents")
+#+OPTIONS: toc:nil num:nil
+
+#+begin_comment
+ (eepitch-shell)
+ (eepitch-kill)
+ (eepitch-shell)
+cd ~/emlua/
+laf
+rm -v *~
+rm -v *.html
+
+# (find-fline   "~/emlua/")
+# (magit-status "~/emlua/")
+# (find-gitk    "~/emlua/")
+#
+#   (s)tage all changes
+#   (c)ommit -> (c)reate
+#   (P)ush -> (p)ushremote
+#   https://github.com/edrx/emlua
+#
+#+end_comment
+
+#+TITLE: Emlua: run Lua in Emacs as a module
+
+Emlua implements a /very minimalistic/ way to run a Lua interpreter
+inside Emacs /as a module/. Running a Lua REPL in Emacs [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Interactive-Shell.html][in a shell
+buffer]] is trivial - see [[http://angg.twu.net/LATEX/2021emacsconf.pdf#page=3][these slides]], the [[http://angg.twu.net/emacsconf2021.html][page]] of my presentation at
+the EmacsConf2021, or [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6][this tutorial]] - but Emlua does something
+different.
+
+To test Emlua you will need: 1) an Emacs compiled with support for
+[[http://www.gnu.org/software/emacs/manual/html_node/elisp/Dynamic-Modules.html][dynamic modules]], 2) [[https://packages.debian.org/bullseye/liblua5.3-dev][liblua5.3-dev]] or something equivalent to it,
+and 3) [[http://angg.twu.net/#eev][eev]].
+
+At this moment all the tests are either in [[http://angg.twu.net/emacsconf2021.html][test blocks]] or in [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#3][sexps in
+comments]], so you will need [[http://angg.twu.net/#eev][eev]] to run them - but eev is a [[http://angg.twu.net/eev-intros/find-eev-intro.html#1][very
+non-invasive package]] and it is easy to turn eev-mode on and off, so,
+ahem, "everybody should have eev installed". 🙃
+
+* The low-level way
+
+The low-level way to test Emlua is to run the test blocks in
+emlua.cpp. They will download a copy of emlua from the git repository,
+compile emlua.cpp, load the module with
+
+#+begin_src elisp
+(load "emlua.so")
+#+end_src
+
+an then they will let you run some very low-level tests like:
+
+#+begin_src elisp
+(emlua-dostring "
+  a = a or 0
+  a = a + 1
+  return 22+33, '44', {}, a
+")
+#+end_src
+
+# (find-elnode "Dynamic Modules")
+# (find-elnode "Dynamic Modules" "--with-modules")
+
+
+
+
+# Local Variables:
+# coding:               utf-8-unix
+# modes:                (org-mode fundamental-mode)
+# org-html-postamble:   nil
+# End:
