@@ -55,14 +55,32 @@ ahem, "everybody should have eev installed". 🙃
 * The low-level way
 
 The low-level way to test Emlua is to run the test blocks in
-[[http://angg.twu.net/emlua/emlua.cpp.html#tests-in-tmp][emlua.cpp]]. They will download a copy of emlua from the git repository,
-compile emlua.cpp, load the module with
+[[http://angg.twu.net/emlua/emlua.cpp.html#tests-in-tmp][emlua.cpp]]. Here is a copy of the body of the first one:
+
+#+begin_src sh
+rm -Rfv /tmp/emlua/
+mkdir   /tmp/emlua/
+cd      /tmp/emlua/
+git clone https://github.com/edrx/emlua .
+make
+#+end_src
+
+It downloads a copy of emlua from the git repository and compiles
+emlua.cpp. You may need to set some directories - for example, on my
+machine I need this instead of a plain "make":
+
+#+begin_src sh
+make EMACS_DIR=$HOME/bigsrc/emacs29
+#+end_src
+
+Then load the module with this sexp,
 
 #+begin_src elisp
 (load "emlua.so")
 #+end_src
 
-and then they will let you run some very low-level tests like:
+The test blocks also contain sexps that let you run some very
+low-level tests, like this one:
 
 #+begin_src elisp
 (emlua-dostring "
@@ -85,7 +103,7 @@ strings in case of success, and a string in the case of errors.
 
 * Exchanging data
 
-The file [[http://angg.twu.net/emacs-lua/emlua-data.el.html][emlua-data.el]] implements a very basic way to send strings and
+The file [[http://angg.twu.net/emlua/emlua-data.el.html][emlua-data.el]] implements a very basic way to send strings and
 numbers to Lua code. After loading it we can set the Lua variables a
 and b to 2.34 and "foo bar" by running this:
 
@@ -99,20 +117,16 @@ and b to 2.34 and "foo bar" by running this:
 
 * Two Lua REPLs written in Lua
 
-The file [[http://angg.twu.net/LUA/Repl1.lua.html][Repl1.lua]] contains two Lua REPLs written in Lua. They can
-both be tested by running this setenv
+The file [[http://angg.twu.net/emlua/Repl1.lua.html][Repl1.lua]] contains two Lua REPLs written in Lua. They can
+both be tested by running this setenv to [[http://angg.twu.net/emlua/edrxlib.lua.html][set the Lua init file]],
 
 #+begin_src elisp
-;; The test blocks in emlua.cpp cloned the git repo in the
-;; directory /tmp/emlua/, and Repl1.lua needs my Lua init file,
-;; that is in /tmp/emlua/edrxlib.lua.  We need to make the
-;; environment variable LUA_INIT point to it:
 (setenv "LUA_INIT" "@/tmp/emlua/edrxlib.lua")
 #+end_src
 
 and then running the test blocks in Repl1.lua. The REPL implemented by
-the class EdrxRepl is very simple, and the other one, implemented by
-the class EdrxEmacsRepl, is a variant of EdrxRepl that redirects the
+the class [[http://angg.twu.net/emlua/Repl1.lua.html#EdrxRepl][EdrxRepl]] is very simple, and the other one, implemented by
+the class [[http://angg.twu.net/emlua/Repl1.lua.html#EdrxEmacsRepl][EdrxEmacsRepl]], is a variant of EdrxRepl that [[http://angg.twu.net/emlua/Repl1.lua.html#WithFakePrint][redirects]] the
 outputs of print and (io.)write to a string before writing it to
 stdout. The REPL that runs inside Emacs uses the class EdrxEmacsRepl,
 but calls functions in it that return the output as a string.
@@ -121,9 +135,10 @@ but calls functions in it that return the output as a string.
 
 * The file emlua-init.el
 
-The file emlua-init.el contains functions that load the lua module,
-load edrxlib.lua and Repl1.lua, and create a variable REPL containing
-an instance of the class EdrxEmacsRepl. Try:
+The file [[http://angg.twu.net/emlua/emlua-init.el.html][emlua-init.el]] contains functions that load the lua module,
+load edrxlib.lua and Repl1.lua, and create a global variable REPL in
+the Lua interpreter containing an instance of the class EdrxEmacsRepl.
+Try:
 
 #+begin_src elisp
 (add-to-list 'load-path "/tmp/emlua/")
@@ -153,9 +168,12 @@ eev you can use something like this to point to the files in emlua:
 
 * Running the Lua REPL in Emacs
 
-The file emlua-init.lua...
-
-The file emlua-repl.lua...
+The file [[http://angg.twu.net/emlua/emlua-repl.el.html][emlua-repl.el]] defines a function called [[http://angg.twu.net/emlua/emlua-repl.el.html#eepitch-emlua][eepitch-emlua]] that
+works as a variant of [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6][eepitch-shell]], but whose [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6.2][target]] is the Lua
+interpreter in the dynamic module. I still need to rewrite many things
+in emlua-repl.el to make the code clearer, but the comment at the top
+of the file should be clear enough, and the test blocks should be easy
+to test (I hope). There is a screenshot [[http://angg.twu.net/IMAGES/2022eepitch-emlua-0.png][here]].
 
 
 

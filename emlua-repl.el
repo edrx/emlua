@@ -306,16 +306,9 @@ PPPV(EdrxEmacsRepl.__index)
 
 
 
-;; TODO: change eepitch-emlua
-
-
-
-(defun emlua-eval-this ()
-  (eval (ee-read (aref (emlua-dostring "return eval_this") 0))))
-
-
-
-
+;; TODO: rewrite this idea, that was from an older version...
+;; (defun emlua-eval-this ()
+;;   (eval (ee-read (aref (emlua-dostring "return eval_this") 0))))
 
 (provide 'emlua-repl)
 

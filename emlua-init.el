@@ -1,7 +1,7 @@
 ;; This file:
-;;   http://angg.twu.net/emacs-lua/emlua-init.el.html
-;;   http://angg.twu.net/emacs-lua/emlua-init.el
-;;           (find-angg "emacs-lua/emlua-init.el")
+;;   http://angg.twu.net/emlua/emlua-init.el.html
+;;   http://angg.twu.net/emlua/emlua-init.el
+;;           (find-angg "emlua/emlua-init.el")
 ;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-init.el
 ;;           https://github.com/edrx/emlua/blob/main/emlua-init.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
