@@ -11,7 +11,7 @@
 # License: GPL2
 # 
 # See: https://github.com/edrx/emlua
-#
+# 
 # Some eev-isms:
 # (defun c  () (interactive) (eek "C-c C-e h h"))
 # (defun o  () (interactive) (find-angg "emlua/README.org"))
@@ -23,11 +23,11 @@
 # (find-gitk    "~/emlua/")
 # (find-mygitrepo-links "emlua")
 # (find-orgnode "Table of Contents")
-#
+# 
 #   (s)tage all changes
 #   (c)ommit -> (c)reate
 #   (P)ush -> (p)ushremote
-#
+# 
 #+OPTIONS: toc:nil num:nil
 
 
