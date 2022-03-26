@@ -1,10 +1,17 @@
 -- This file:
---   http://angg.twu.net/LUA/Repl1.lua.html
---   http://angg.twu.net/LUA/Repl1.lua
---           (find-angg "LUA/Repl1.lua")
+--     http://angg.twu.net/LUA/Repl1.lua.html
+--     http://angg.twu.net/LUA/Repl1.lua
+--             (find-angg "LUA/Repl1.lua")
+--   http://angg.twu.net/emlua/Repl1.lua.html
+--   http://angg.twu.net/emlua/Repl1.lua
+--           (find-angg "emlua/Repl1.lua")
+-- https://raw.githubusercontent.com/edrx/emlua/main/Repl1.lua
+--           https://github.com/edrx/emlua/blob/main/Repl1.lua
 -- Author: Eduardo Ochs <eduardoochs@gmail.com>
+-- Version: 2022mar26
+-- License: GPL2
 --
--- (defun e () (interactive) (find-angg "LUA/Repl1.lua"))
+-- See: https://github.com/edrx/emlua
 
 -- Tools:
 -- «.WithFakePrint»		(to "WithFakePrint")
@@ -189,7 +196,19 @@ xpcall(function () F02("error 'foo'") end,
 --                                                                
 -- «MultiLineCmd»  (to ".MultiLineCmd")
 -- The class MultiLineCmd implements the hard part of the "read" part
--- of the read-eval-print loop of EdrxRepl.
+-- of the read-eval-print loop of EdrxRepl. The simple part is:
+--
+--   mlc:status()   tells if the input is complete, incomplete,
+--                  or has a compilation error,
+--   mlc:add(line)  adds a line to the input.
+--
+-- Checking if the input is incomplete is very tricky, especially
+-- because we need to support the prefix "=", that in the standard Lua
+-- REPL means "treat the rest of the input as an expression and print
+-- its result". This is done by the methods :luacode() and
+-- :luacodewithprint(), that translate the input in different ways.
+-- See the comments in the class EdrxRepl below to understand how
+-- these translations are used.
 --
 -- See: (find-angg "emacs-lua/EdrxRepl.lua" "EdrxRepl")
 --      (find-angg "emacs-lua/EdrxRepl.lua" "EdrxRepl" "near '?<eof>'?$")
@@ -266,6 +285,55 @@ mlc = MultiLineCmd.new("= 20,")
 --                                |_|      
 --
 -- «EdrxRepl»  (to ".EdrxRepl")
+-- A simple REPL for Lua. Usage:
+--
+--   REPL = EdrxRepl:new(); REPL:repl()
+--
+-- To exit the REPL set REPL.stop to true.
+-- The code is run by the method :evalprint().
+--
+--
+-- NOTE ON THE PREFIX '=':
+-- =======================
+-- The manpages of lua5.1 and lua5.2 explain how the Lua REPL treats
+-- the prefix "=" in this way:
+-- 
+--   If a line starts with '=', then lua displays the values of all
+--   the expressions in the remainder of the line. The expressions
+--   must be separated by commas.
+-- 
+-- In Lua5.3 they changed that to this (also copied from the manpage):
+-- 
+--   If the line contains an expression or list of expressions, then
+--   the line is evaluated and the results are printed.
+-- 
+-- The prefix "=" is still supported in Lua5.3, but is not documented.
+-- The class MultiLineCmd implements a behavior similar to the one in
+-- lua5.1 and lua5.2. For example, here
+--
+--   >>> = 22+33,
+--   ...   44, 'foo bar'
+--   55      44      foo bar
+--
+-- we have this (before the execution):
+--
+--   r.mlc:concat()             -->      "= 22,33,\n  44, 'foo bar'"
+--   r.mlc:luacode()            --> "return 22,33,\n  44, 'foo bar'"
+--   r.mlc:luacodewithprint()   -->  "print(22,33,\n  44, 'foo bar'\n)"
+--
+-- The method :luacode() in the class MultiLineCmd is used to check if
+-- the input is complete, and the method :luacodewithprint() is used
+-- to produce the code that is executed by the xpcall in the method
+-- :evalprint() of EdrxRepl. It should be easy to add support for
+-- other prefixes - we just need to change :luacode() and
+-- :luacodewithprint().
+--
+-- See for example this thread:
+-- http://lua-users.org/lists/lua-l/2020-10/msg00209.html
+
+
+
+
 -- See: (find-angg "emacs-lua/EdrxRepl.lua" "EdrxRepl")
 --      (find-angg "emacs-lua/EdrxRepl.lua" "EdrxRepl-emacs")
 --

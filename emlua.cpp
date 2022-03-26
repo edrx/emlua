@@ -2,10 +2,14 @@
 //   http://angg.twu.net/emlua/emlua.cpp.html
 //   http://angg.twu.net/emlua/emlua.cpp
 //           (find-angg "emlua/emlua.cpp")
+// https://raw.githubusercontent.com/edrx/emlua/main/emlua.cpp
+//           https://github.com/edrx/emlua/blob/main/emlua.cpp
 // Authors: <nerditation@outlook.com> (part in C++),
 //          <eduardoochs@gmail.com> (all the rest).
 // Version: 2022mar25
 // License: GPL2
+//
+// See: https://github.com/edrx/emlua
 //
 // «.tests-in-tmp»	(to "tests-in-tmp")
 // «.tests-edrx»	(to "tests-edrx")
@@ -117,7 +121,7 @@ make clean
 make
 # make EMACS_DIR=$HOME/usrc/emacs29
 
-# (load "/tmp/emlua.so")
+# (load "/tmp/emlua/emlua.so")
 # (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
 # (emlua-dostring "err")
 

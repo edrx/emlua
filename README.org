@@ -4,37 +4,41 @@
 #       http://angg.twu.net/emlua/README.org
 #               (find-angg "emlua/README.org")
 #               (find-angg "emlua/")
+# https://raw.githubusercontent.com/edrx/emlua/main/README.org
+#           https://github.com/edrx/emlua/blob/main/README.org
 # Author: Eduardo Ochs <eduardoochs@gmail.com>
+# Version: 2022mar26
+# License: GPL2
 # 
+# See: https://github.com/edrx/emlua
+#
 # Some eev-isms:
 # (defun c  () (interactive) (eek "C-c C-e h h"))
 # (defun o  () (interactive) (find-angg "emlua/README.org"))
 # (defun v  () (interactive) (brg     "~/emlua/README.html"))
 # (defun cv () (interactive) (c) (v))
 # 
-# (find-mygitrepo-links "emlua")
-# (find-orgnode "Table of Contents")
-#+OPTIONS: toc:nil num:nil
-
-#+begin_comment
 # (find-fline   "~/emlua/")
 # (magit-status "~/emlua/")
 # (find-gitk    "~/emlua/")
+# (find-mygitrepo-links "emlua")
+# (find-orgnode "Table of Contents")
 #
 #   (s)tage all changes
 #   (c)ommit -> (c)reate
 #   (P)ush -> (p)ushremote
-#   https://github.com/edrx/emlua
 #
-#+end_comment
+#+OPTIONS: toc:nil num:nil
+
+
 
 #+TITLE: Emlua: run Lua in Emacs as a module
 
 Emlua implements a /very minimalistic/ way to run a Lua interpreter
 inside Emacs /as a module/. Running a Lua REPL in Emacs [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Interactive-Shell.html][in a shell
 buffer]] is trivial - see [[http://angg.twu.net/LATEX/2021emacsconf.pdf#page=3][these slides]], the [[http://angg.twu.net/emacsconf2021.html][page]] of my presentation at
-the EmacsConf2021, or [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6][this tutorial]] - but Emlua does something
-different.
+the EmacsConf2021, or [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6][this tutorial of eepitch]] - but Emlua does
+something different.
 
 To test Emlua you will need: 1) an Emacs compiled with support for
 [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Dynamic-Modules.html][dynamic modules]], 2) [[https://packages.debian.org/bullseye/liblua5.3-dev][liblua5.3-dev]] or something equivalent to it,
@@ -51,7 +55,7 @@ ahem, "everybody should have eev installed". 🙃
 * The low-level way
 
 The low-level way to test Emlua is to run the test blocks in
-emlua.cpp. They will download a copy of emlua from the git repository,
+[[http://angg.twu.net/emlua/emlua.cpp.html#tests-in-tmp][emlua.cpp]]. They will download a copy of emlua from the git repository,
 compile emlua.cpp, load the module with
 
 #+begin_src elisp
@@ -81,7 +85,7 @@ strings in case of success, and a string in the case of errors.
 
 * Exchanging data
 
-The file emlua-data.el implements a very basic way to send strings and
+The file [[http://angg.twu.net/emacs-lua/emlua-data.el.html][emlua-data.el]] implements a very basic way to send strings and
 numbers to Lua code. After loading it we can set the Lua variables a
 and b to 2.34 and "foo bar" by running this:
 
@@ -92,10 +96,66 @@ and b to 2.34 and "foo bar" by running this:
 #+end_src
 
 
-* The REPL
 
-...is in the file Repl1.lua, but the code in elisp that makes it easy
-to use is not in the git repository yet.
+* Two Lua REPLs written in Lua
+
+The file [[http://angg.twu.net/LUA/Repl1.lua.html][Repl1.lua]] contains two Lua REPLs written in Lua. They can
+both be tested by running this setenv
+
+#+begin_src elisp
+;; The test blocks in emlua.cpp cloned the git repo in the
+;; directory /tmp/emlua/, and Repl1.lua needs my Lua init file,
+;; that is in /tmp/emlua/edrxlib.lua.  We need to make the
+;; environment variable LUA_INIT point to it:
+(setenv "LUA_INIT" "@/tmp/emlua/edrxlib.lua")
+#+end_src
+
+and then running the test blocks in Repl1.lua. The REPL implemented by
+the class EdrxRepl is very simple, and the other one, implemented by
+the class EdrxEmacsRepl, is a variant of EdrxRepl that redirects the
+outputs of print and (io.)write to a string before writing it to
+stdout. The REPL that runs inside Emacs uses the class EdrxEmacsRepl,
+but calls functions in it that return the output as a string.
+
+
+
+* The file emlua-init.el
+
+The file emlua-init.el contains functions that load the lua module,
+load edrxlib.lua and Repl1.lua, and create a variable REPL containing
+an instance of the class EdrxEmacsRepl. Try:
+
+#+begin_src elisp
+(add-to-list 'load-path "/tmp/emlua/")
+(emlua-init-so)
+(emlua-init-dofiles)
+(emlua-init-newrepl)
+#+end_src
+
+
+
+* Accessing the files with code-c-d
+
+If you understand how to create "[[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#9][short hyperlinks]]" with code-c-d in
+eev you can use something like this to point to the files in emlua:
+
+#+begin_src elisp
+(code-c-d "emlua" "/tmp/emlua/" :anchor)
+(find-emluafile "")
+(find-emluafile "emlua-data.lua")
+(find-emluafile "emlua-init.lua")
+(find-emluafile "README.org")
+(find-emluafile "Repl1.lua")
+(find-emlua "Repl1.lua")
+(find-emlua "Repl1.lua" "EdrxEmacsRepl")
+#+end_src
+
+
+* Running the Lua REPL in Emacs
+
+The file emlua-init.lua...
+
+The file emlua-repl.lua...
 
 
 

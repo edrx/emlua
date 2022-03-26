@@ -1,12 +1,16 @@
-;;; This file:
-;;;   http://angg.twu.net/emacs-lua/emlua-data.el.html
-;;;   http://angg.twu.net/emacs-lua/emlua-data.el
-;;;           (find-angg "emacs-lua/emlua-data.el")
-;;; Author: Eduardo Ochs <eduardoochs@gmail.com>
-;;;
-;;; (defun e () (interactive) (find-angg "emacs-lua/emlua-data.el"))
+;; This file:
+;;   http://angg.twu.net/emacs-lua/emlua-data.el.html
+;;   http://angg.twu.net/emacs-lua/emlua-data.el
+;;           (find-angg "emacs-lua/emlua-data.el")
+;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-data.el
+;;           https://github.com/edrx/emlua/blob/main/emlua-data.el
+;; Author: Eduardo Ochs <eduardoochs@gmail.com>
+;; Version: 2022mar26
+;; License: GPL2
+;;
+;; See: https://github.com/edrx/emlua
 
-;; Some functions send data from Emacs to Lua.
+;; Some functions to send data from Emacs to Lua.
 ;; In this file Lua programs are always considered as being strings,
 ;; and Lua numbers and Lua strings are considered as how they appear
 ;; in Lua programs. So:

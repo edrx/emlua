@@ -2,18 +2,64 @@
 ;;   http://angg.twu.net/emlua/emlua-repl.el.html
 ;;   http://angg.twu.net/emlua/emlua-repl.el
 ;;           (find-angg "emlua/emlua-repl.el")
+;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-repl.el
+;;           https://github.com/edrx/emlua/blob/main/emlua-repl.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
 ;; Version: 2022mar26
-;; Status: seems to work but needs more tests and comments
+;; License: GPL2
 ;;
-;; (defun e () (interactive) (find-angg "emlua/emlua-repl.el"))
+;; See: https://github.com/edrx/emlua
+
+;; This file implements `eepitch-emlua', that is an eepitch whose
+;; target is a Lua interpreter running in a dynamic module loaded by
+;; Emacs. The interaction with that interpreter is shown in a buffer
+;; called "*emlua*".
+;;
+;; Note: this is my N-th attempt (for N big!) of rewriting this file
+;; to make its code easy to understand... but it still needs more
+;; rewrites, and lots of explanations and tests. In particular, 1) I
+;; need to rename some functions to make clear that we are
+;; implementing a kind of an "inferior process" running Lua, 2) I need
+;; to explain that the buffer "*emlua*" is just a log of our
+;; interactions with our "inferior Lua" via `eepitch-emlua-esend' -
+;; lines typed there are not automatically sent to the inferior Lua,
+;; 3) it _seems_ that the functions that end in "-bw" are not needed,
+;; 4) only a few functions defined in eepitch.el use
+;;
+;;   (setq eepitch-line 'eeepitch-line-<suffix>)
+;;
+;; to set up alternative ways to send lines to the target. I did not
+;; remember the details of how they worked, and I improvised a lot,
+;; using functions with bad names and weird constructs... I need to
+;; clean up that code A LOT. There are some examples of "official"
+;; functions that use alternative `eepitch-line's here:
+;;
+;;   (find-eev "eepitch.el" "other-terms")
+;; 
+;; See also:
+;; 
+;;   (find-eev "eepitch.el" "eepitch-this-line")
 
 ;; «.faces»			(to "faces")
-;; «.eepitch-emlua-insert»	(to "eepitch-emlua-insert")
+;; «.find-buffer»		(to "find-buffer")
+;; «.prep»			(to "prep")
+;; «.insert»			(to "insert")
+;; «.eepitch-emlua-fakesend»	(to "eepitch-emlua-fakesend")
+;; «.esend»			(to "esend")
+;; «.eepitch-emlua»		(to "eepitch-emlua")
 
-;; (add-to-list 'load-path "~/emlua/")
-;; (load (buffer-file-name))
-;; (emlua-init)
+
+
+
+;; To test this, compile emlua.cpp, then run:
+;;
+;;   (add-to-list 'load-path default-directory)
+;;   (require 'emlua-repl)
+;;   (emlua-init-so)
+;;   (emlua-init-dofiles)
+;;   (emlua-init-newrepl)
+;;
+;; and then run the test blocks in this file.
 
 (require 'eepitch)
 (require 'emlua-data)
@@ -56,6 +102,7 @@
 ;;; |  _| | | | | (_| |_____| |_) | |_| |  _|  _|  __/ |   
 ;;; |_| |_|_| |_|\__,_|     |_.__/ \__,_|_| |_|  \___|_|   
 ;;;                                                        
+;; «find-buffer»  (to ".find-buffer")
 ;; Tests: (eepitch-emlua-insert-prepare)
 ;;        (eepitch-emlua-insert-user-input "foo")
 ;;        (eepitch-emlua-insert-output "bar plic\n")
@@ -84,6 +131,8 @@ buffer if it does not exist."
 ;;; | |_) | | |  __/ |_) |
 ;;; | .__/|_|  \___| .__/ 
 ;;; |_|            |_|    
+;;
+;; «prep»  (to ".prep")
 
 (defun eepitch-emlua-window ()
   (get-buffer-window "*emlua*"))
@@ -110,6 +159,7 @@ buffer if it does not exist."
 ;;; | | | | \__ \  __/ |  | |_ 
 ;;; |_|_| |_|___/\___|_|   \__|
 ;;;                            
+;; «insert»  (to ".insert")
 
 (defun eepitch-emlua-insert-b (str &optional face)
   "Insert STR at the end of the emlua buffer - buffer-only version"
@@ -142,12 +192,43 @@ buffer if it does not exist."
 
 
 
+;;;   __       _                            _ 
+;;;  / _| __ _| | _____  ___  ___ _ __   __| |
+;;; | |_ / _` | |/ / _ \/ __|/ _ \ '_ \ / _` |
+;;; |  _| (_| |   <  __/\__ \  __/ | | | (_| |
+;;; |_|  \__,_|_|\_\___||___/\___|_| |_|\__,_|
+;;;                                           
+;; «eepitch-emlua-fakesend»  (to ".eepitch-emlua-fakesend")
+
+(defun eepitch-emlua-fakesend (line)
+  (eepitch-eval-at-target-window
+   '(progn
+      ;; (save-excursion (eepitch-emlua-prep-b))
+      (eepitch-emlua-prep-b)
+      (eepitch-emlua-insert-user-input line)
+      (eepitch-emlua-insert-output "(Using fakesend)\n")
+      (eepitch-emlua-insert-prompt ">>> "))))
+
+
+'("This is a test block:
+ (eepitch-emlua-fakesend)
+ (eepitch-kill)
+ (eepitch-emlua-fakesend)
+foo
+bar
+
+--")
+
+
+
+
 ;;;                           _ 
 ;;;   ___  ___  ___ _ __   __| |
 ;;;  / _ \/ __|/ _ \ '_ \ / _` |
 ;;; |  __/\__ \  __/ | | | (_| |
 ;;;  \___||___/\___|_| |_|\__,_|
 ;;;                             
+;; «esend»  (to ".esend")
 
 (defvar eepitch-emlua-out nil
   "The results of the last call to `eepitch-emlua-esend0'.")
@@ -181,23 +262,6 @@ buffer if it does not exist."
       (eepitch-emlua-eprompt))))
 
 
-;;;   __       _                            _ 
-;;;  / _| __ _| | _____  ___  ___ _ __   __| |
-;;; | |_ / _` | |/ / _ \/ __|/ _ \ '_ \ / _` |
-;;; |  _| (_| |   <  __/\__ \  __/ | | | (_| |
-;;; |_|  \__,_|_|\_\___||___/\___|_| |_|\__,_|
-;;;                                           
-
-(defun eepitch-emlua-fakesend (line)
-  (eepitch-eval-at-target-window
-   '(progn
-      ;; (save-excursion (eepitch-emlua-prep-b))
-      (eepitch-emlua-prep-b)
-      (eepitch-emlua-insert-user-input line)
-      (eepitch-emlua-insert-output "(Using fakesend)\n")
-      (eepitch-emlua-insert-prompt ">>> "))))
-
-
 
 
 
@@ -207,20 +271,17 @@ buffer if it does not exist."
 ;;; |  __/  __/ |_) | | || (__| | | |_____|  __/ | | | | | | |_| | (_| |
 ;;;  \___|\___| .__/|_|\__\___|_| |_|      \___|_| |_| |_|_|\__,_|\__,_|
 ;;;           |_|                                                       
+;;
+;; «eepitch-emlua»  (to ".eepitch-emlua")
 
 (defun eepitch-emlua ()
-  "Setup eepitch-ing to an emlua buffer.
-This function is a prototype that only works in a controlled setting."
+  "Setup eepitch-ing to an emlua buffer."
   (interactive)
   (defalias 'eepitch-emlua-prep   'eepitch-emlua-prep-b)
   (defalias 'eepitch-emlua-insert 'eepitch-emlua-insert-b)
   (eepitch '(eepitch-emlua-find-buffer))
   (setq eepitch-line 'eepitch-emlua-esend)
   )
-
-
-
-
 
 
 
@@ -245,15 +306,9 @@ PPPV(EdrxEmacsRepl.__index)
 
 
 
+;; TODO: change eepitch-emlua
 
-;;;                 _                                   _       _   _     _     
-;;;   ___ _ __ ___ | |_   _  __ _        _____   ____ _| |     | |_| |__ (_)___ 
-;;;  / _ \ '_ ` _ \| | | | |/ _` |_____ / _ \ \ / / _` | |_____| __| '_ \| / __|
-;;; |  __/ | | | | | | |_| | (_| |_____|  __/\ V / (_| | |_____| |_| | | | \__ \
-;;;  \___|_| |_| |_|_|\__,_|\__,_|      \___| \_/ \__,_|_|      \__|_| |_|_|___/
-;;;                                                                             
-;; «emlua-eval-this»  (to ".emlua-eval-this")
-;; Old code, needs updating
+
 
 (defun emlua-eval-this ()
   (eval (ee-read (aref (emlua-dostring "return eval_this") 0))))

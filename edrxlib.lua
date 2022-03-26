@@ -2,6 +2,7 @@
 --            http://angg.twu.net/LATEX/dednat6/edrxlib.lua.html
 --            http://angg.twu.net/dednat6/dednat6/edrxlib.lua.html
 --            http://angg.twu.net/blogme3/edrxlib.lua.html
+--            http://angg.twu.net/emlua/edrxlib.lua.html
 --
 -- This is my "init file" for Lua. As I have LUA_INIT set
 -- to "@$HOME/LUA/lua50init.lua", the Lua interpreter loads
@@ -10,19 +11,19 @@
 --      (find-lua51manual "#6" "LUA_INIT" "@filename")
 --      (find-es "lua5" "LUA_INIT")
 --
--- This is _also_ the module "edrxlib.lua" in dednat6 and blogme3!
+-- This is _also_ the module "edrxlib.lua" in dednat6, blogme3, and emlua!
 -- I use these sexps to keep them in sync:
 --   (find-tkdiff    "~/LUA/lua50init.lua"   "~/LATEX/dednat6/edrxlib.lua")
 --   (find-tkdiff    "~/LUA/lua50init.lua" "~/dednat6/dednat6/edrxlib.lua")
 --   (find-sh0 "cp -v ~/LUA/lua50init.lua     ~/LATEX/dednat6/edrxlib.lua")
 --   (find-sh0 "cp -v ~/LUA/lua50init.lua   ~/dednat6/dednat6/edrxlib.lua")
 --   (find-sh0 "cp -v ~/LUA/lua50init.lua           ~/blogme3/edrxlib.lua")
---   (find-sh0 "cp -v ~/LUA/lua50init.lua         ~/emacs-lua/edrxlib.lua")
+--   (find-sh0 "cp -v ~/LUA/lua50init.lua             ~/emlua/edrxlib.lua")
 -- Old way: (find-es "emacs" "hard-links")
 -- See also: (to "edrxlib")
 --
 -- Author: Eduardo Ochs <eduardoochs@gmail.com>
--- Version: 2022mar23  <- don't trust this date
+-- Version: 2022mar26  <- don't trust this date
 -- Public domain.
 --
 -- Note: "dednat4.lua" and "dednat6.lua" try to load this at startup,
@@ -39,8 +40,10 @@
 --
 -- This init file used to work both on lua-5.0 and lua-5.1...
 -- I have stopped using lua-5.0, but I kept the name of this file.
--- This works on Lua 5.1, 5.2, 5.3, and 5.4.
--- Beware: this file has A LOT of cruft!...
+-- This file works on Lua 5.1, 5.2, 5.3, and 5.4.
+--
+-- This file still has _A LOT_ of cruft!
+
 
 
 
@@ -149,15 +152,15 @@
 --   «.lpeg_gsub»		(to "lpeg_gsub")
 --   «.lpeg_gsub_»		(to "lpeg_gsub_")
 --   «.lpeg_balanced»		(to "lpeg_balanced")
--- «.mytraceback»		(to "mytraceback")
--- «.errorfb_line»		(to "errorfb_line")
--- «.ee_template»		(to "ee_template")
 -- «.ee_into»			(to "ee_into")
 -- «.chdir»			(to "chdir")
 -- «.hms_to_s»			(to "hms_to_s")
 -- «.s_to_hms»			(to "s_to_hms")
 -- «.icollect»			(to "icollect")
 --
+-- «.mytraceback»		(to "mytraceback")
+-- «.errorfb_line»		(to "errorfb_line")
+-- «.ee_template»		(to "ee_template")
 -- «.interactor»		(to "interactor")
 -- «.MyXpcall»			(to "MyXpcall")
 -- «.Repl»			(to "Repl")
@@ -893,7 +896,7 @@ DGetInfo = Class {
   --
   -- Adapted from (the middle part of) the traceback function
   -- of Prosody. See the message by Matthew Wild in
-  -- <http://lua-users.org/lists/lua-l/2022-03/> (mar 21).
+  -- http://lua-users.org/lists/lua-l/2022-03/msg00071.html
   prosodytraceback = function (info)
     local line
     local func_type = info.namewhat.." "
@@ -1772,7 +1775,6 @@ PPeval = function (str)
   end
 
 -- «loadlpeg»  (to ".loadlpeg")
--- Obsolete.
 -- (find-es "lua5" "lpeg-0.7")
 -- (find-es "lua5" "lpeg-0.8.1")
 -- (find-es "lua5" "lpeg-0.9")
@@ -1798,85 +1800,96 @@ loadlpeg = function ()
   end
 
 -- «loadbitlib»  (to ".loadbitlib")
--- (find-es "lua5" "bitlib-51")
-loadbitlib = function (fname)
-    if bit then return "bitlib already loaded" end
-    fname = fname or "~/usrc/bitlib-25/lbitlib.so"
-    assert(package.loadlib(ee_expand(fname), "luaopen_bit"))()
-  end
+-- Obsolete.
+-- -- (find-es "lua5" "bitlib-51")
+-- loadbitlib = function (fname)
+--     if bit then return "bitlib already loaded" end
+--     fname = fname or "~/usrc/bitlib-25/lbitlib.so"
+--     assert(package.loadlib(ee_expand(fname), "luaopen_bit"))()
+--   end
+
 
 -- «autoload»  (to ".autoload")
--- Like in elisp. For global functions only.
--- (find-lua51manual "#pdf-require")
---
-autoload = function (funname, loader)
-    _G[funname] = function (...)
-        loader()
-        return _G[funname](unpack(arg)) -- todo: change to "..." (a 5.1-ism)
-      end
-  end
+-- Obsolete.
+-- -- Like in elisp. For global functions only.
+-- -- (find-lua51manual "#pdf-require")
+-- --
+-- autoload = function (funname, loader)
+--     _G[funname] = function (...)
+--         loader()
+--         return _G[funname](unpack(arg)) -- todo: change to "..." (a 5.1-ism)
+--       end
+--   end
+-- 
+-- tcl = function (...)   -- <-- this is a kind of autoload
+--     local filename = ee_expand("~/.lua51/luatclbridge.so")
+--     local initname = "luaopen_luatclbridge"
+--     tcl = assert(package.loadlib(filename, initname))()
+--     return tcl(unpack(arg))             -- todo: change to "..." (a 5.1-ism)
+--   end
 
-tcl = function (...)   -- <-- this is a kind of autoload
-    local filename = ee_expand("~/.lua51/luatclbridge.so")
-    local initname = "luaopen_luatclbridge"
-    tcl = assert(package.loadlib(filename, initname))()
-    return tcl(unpack(arg))             -- todo: change to "..." (a 5.1-ism)
-  end
 
 -- «loadtcl»  (to ".loadtcl")
--- (find-es "lua5" "luatclbridge")
--- (find-angg "LUA/luatclbridge.c")
+-- Obsolete.
+-- -- (find-es "lua5" "luatclbridge")
+-- -- (find-angg "LUA/luatclbridge.c")
+-- -- loadtcl = function ()
+-- --     local filename = ee_expand("~/LUA/tlbridge.so")
+-- --     local initname = "luaopen_tlbridge"
+-- --     tcl = tcl or assert(package.loadlib(filename, initname))()
+-- --   end
 -- loadtcl = function ()
---     local filename = ee_expand("~/LUA/tlbridge.so")
---     local initname = "luaopen_tlbridge"
---     tcl = tcl or assert(package.loadlib(filename, initname))()
+--     -- local filename = ee_expand("~/LUA/luatclbridge.so")
+--     local filename = ee_expand("~/.lua51/luatclbridge.so")
+--     local initname = "luaopen_luatclbridge"
+--     if not tcl then
+--       tcl, tclfindexecutable = assert(package.loadlib(filename, initname))()
+--       tclfindexecutable("/home/edrx/usrc/tk8.4/tk8.4-8.4.12/unix/wish") -- test
+--     end
 --   end
-loadtcl = function ()
-    -- local filename = ee_expand("~/LUA/luatclbridge.so")
-    local filename = ee_expand("~/.lua51/luatclbridge.so")
-    local initname = "luaopen_luatclbridge"
-    if not tcl then
-      tcl, tclfindexecutable = assert(package.loadlib(filename, initname))()
-      tclfindexecutable("/home/edrx/usrc/tk8.4/tk8.4-8.4.12/unix/wish") -- test
-    end
-  end
-loadtk     = function () loadtcl(); return tcl("package require Tk") end
-loadexpect = function () loadtcl(); return tcl("package require Expect") end
-loadsnack  = function () loadtcl(); return tcl("package require sound") end
--- (find-es "tcl" "snack")
--- (find-anggfile "TCL/piano.tcl")
+-- loadtk     = function () loadtcl(); return tcl("package require Tk") end
+-- loadexpect = function () loadtcl(); return tcl("package require Expect") end
+-- loadsnack  = function () loadtcl(); return tcl("package require sound") end
+-- -- (find-es "tcl" "snack")
+-- -- (find-anggfile "TCL/piano.tcl")
+
 
 -- «loadldb»  (to ".loadldb")
--- (find-es "lua5" "ldb-from-tgz")
--- (find-es "lua5" "ldb")
-loadldb = function ()
-    local oldpath = package.path
-    -- package.path = ee_expand("$S/http/primero.ricilake.net/lua/?.lua")
-    -- package.path = ee_expand("~/LUA/?.lua")
-    package.path = ee_expand("~/usrc/ldb/?.lua")
-    ldb = require "ldb"
-    package.path = oldpath
-  end
+-- Obsolete.
+-- -- (find-es "lua5" "ldb-from-tgz")
+-- -- (find-es "lua5" "ldb")
+-- loadldb = function ()
+--     local oldpath = package.path
+--     -- package.path = ee_expand("$S/http/primero.ricilake.net/lua/?.lua")
+--     -- package.path = ee_expand("~/LUA/?.lua")
+--     package.path = ee_expand("~/usrc/ldb/?.lua")
+--     ldb = require "ldb"
+--     package.path = oldpath
+--   end
+
 
 -- «loadpeek»  (to ".loadpeek")
--- (find-angg "DAVINCI/peek.c")
--- (find-angg "DAVINCI/peek.lua")
-loadpeek = function ()
-    if not peek then
-      assert(package.loadlib(ee_expand("~/DAVINCI/peek.so"), "peek_init"))()
-    end
-  end
-getaddr = function (obj)
-    return tonumber(string.match(tostring(obj), " 0x([0-9A-Za-z]+)"), 16)
-  end
+-- Obsolete.
+-- -- (find-angg "DAVINCI/peek.c")
+-- -- (find-angg "DAVINCI/peek.lua")
+-- loadpeek = function ()
+--     if not peek then
+--       assert(package.loadlib(ee_expand("~/DAVINCI/peek.so"), "peek_init"))()
+--     end
+--   end
+-- getaddr = function (obj)
+--     return tonumber(string.match(tostring(obj), " 0x([0-9A-Za-z]+)"), 16)
+--   end
+
 
 -- «loadalarm»  (to ".loadalarm")
--- (find-es "lua5" "signal")
-loadalarm = function ()
-    if not alarm then
-      assert(package.loadlib(ee_expand("~/usrc/alarm/lalarm.so"), "luaopen_alarm"))()
-    end
-  end
+-- Obsolete.
+-- -- (find-es "lua5" "signal")
+-- loadalarm = function ()
+--     if not alarm then
+--       assert(package.loadlib(ee_expand("~/usrc/alarm/lalarm.so"), "luaopen_alarm"))()
+--     end
+--   end
 
 -- «loadposix»  (to ".loadposix")
 -- New way (active below):  (find-es "lua5" "luaposix")
@@ -1898,46 +1911,8 @@ curl = function (url)
 
 
 -- «preparef2n»  (to ".preparef2n")
--- (find-es "lua5" "functionnames")
--- I wrote this in 2007. It's obsolete.
--- See: (find-angg "LUA/DFS.lua")
---
--- preparef2n: create a table with names of functions.
--- Example:
---   f2n = preparef2n()
---   print(f2n(loadstring)) --> "loadstring"
---
--- This is new (2007mar11), and not very well-tested.
--- Note: there's no support yet for submodules (like "socket.http").
--- I wrote this for my traceback functions...
---
-preparef2n__ = function (fun2name, dictname, dictnamedot, dict)
-    for name,value in pairs(dict or _G) do
-      if type(value) == "function" then
-        if string.match(name, "^[A-Za-z_][0-9A-Za-z_]*$") then
-          fun2name[value] = dictnamedot..name
-        else
-          fun2name[value] = string.format("%s[%q]", dictname, name)
-        end
-      end
-    end
-  end
-
-preparef2n_ = function (fun2name, dictnames)
-    for _,dn in ipairs(split(dictnames)) do
-      if dn == "_G"
-      then preparef2n__(fun2name, "_G", "",      _G)
-      else preparef2n__(fun2name, dn,   dn..".", _G[dn])
-      end
-    end
-  end
-
-preparef2n = function (otherdictnames)
-    local f2n = {}
-    local standarddicts = " coroutine debug io math os package string table "
-    preparef2n_(f2n, standarddicts .. (otherdictnames or "") .. " _G ")
-    return f2n
-  end
+-- Supersed by: (find-angg "LUA/DFS.lua")
+-- Very old notes: (find-es "lua5" "functionnames")
 
 
 -- «each2»  (to ".each2")
@@ -2108,57 +2083,8 @@ lpeg_balanced = function (Open, MidChars, Close)
 
 
 
--- «mytraceback»  (to ".mytraceback")
--- Obsolete. See: 
--- (find-es "lua5" "xpcall" "mytraceback =")
--- (find-lua51manual "#pdf-xpcall")
--- (find-lua51manual "#pdf-debug.traceback")
--- (find-lua51manual "#pdf-error")
-mytraceback = function (errmsg)
-    io.output():flush()
-    print(debug.traceback(errmsg, 2))
-  end
-xxcall = function (f)
-    if not xpcall(f, mytraceback) then error() end
-  end
-
-
--- «errorfb_line»  (to ".errorfb_line")
--- (find-es "lua5" "traceback")
--- (find-lua51file "src/ldblib.c" "{\"traceback\", db_errorfb},")
--- (find-lua51file "src/ldblib.c" "static int db_errorfb")
--- (find-lua51file "src/ldblib.c" "static int db_errorfb" "lua_getinfo")
--- http://www.lua.org/source/5.1/ldblib.c.html#db_errorfb
--- http://www.lua.org/source/5.1/ldblib.c.html#dblib
--- (find-es "lua5" "loadstring_and_eof")
--- http://lua-users.org/lists/lua-l/2011-11/msg00110.html
--- (find-es "lua5" "lua_getstack")
-
-errorfb_line = function (ar)
-    local s = "\t"
-    local p = function (...) s = s..format(...) end
-    p("%s:", ar.short_src)
-    if ar.currentline > 0 then p("%d:", ar.currentline) end
-    if ar.namewhat ~= ""  then p(" in function '%s'", ar.name) else
-      if ar.what == "main" then p(" in main chunk")
-      elseif ar.what == "C" or ar.what == "tail" then p(" ?")
-      else p(" in function <%s:%d>", ar.short_src, ar.linedefined)
-      end
-    end
-    return s
-  end
-errorfb_lines = function (a, b, step, f)
-    local T = {}
-    for level=a,b,(step or 1) do
-      T[#T+1] = (f or errorfb_line)(debug.getinfo(level))
-    end
-    return table.concat(T, "\n")
-  end
-
-
-
 -- «ee_template»  (to ".ee_template")
--- (find-eev "eev-insert.el" "ee-template")
+-- (find-eev "eev-template0.el")
 -- ee_template({a="<AA>", b="<BB>"}, "foo{a}bar{c}plic")
 --   --> "foo<AA>bar{c}plic"
 ee_template = function (pairs, templatestr)
@@ -2236,6 +2162,47 @@ icollect_helper = function (t, i, n, f, s, var_1, ...)
 icollect = function (n, f, s, var)
     return icollect_helper({}, 1, n, f, s, f(s, var))
   end
+
+
+-- «mytraceback»  (to ".mytraceback")
+-- «errorfb_line»  (to ".errorfb_line")
+-- Obsolete.
+-- See: (find-angg "LUA/Repl1.lua")
+-- and: (find-angg "LUA/lua50init.lua" "DGetInfos")
+--      (find-angg "LUA/lua50init.lua" "DGetInfos" "tb =")
+--
+-- -- Old notes:
+-- -- (find-es "lua5" "traceback")
+-- -- (find-lua51file "src/ldblib.c" "{\"traceback\", db_errorfb},")
+-- -- (find-lua51file "src/ldblib.c" "static int db_errorfb")
+-- -- (find-lua51file "src/ldblib.c" "static int db_errorfb" "lua_getinfo")
+-- -- http://www.lua.org/source/5.1/ldblib.c.html#db_errorfb
+-- -- http://www.lua.org/source/5.1/ldblib.c.html#dblib
+-- -- (find-es "lua5" "loadstring_and_eof")
+-- -- http://lua-users.org/lists/lua-l/2011-11/msg00110.html
+-- -- (find-es "lua5" "lua_getstack")
+-- 
+-- errorfb_line = function (ar)
+--     local s = "\t"
+--     local p = function (...) s = s..format(...) end
+--     p("%s:", ar.short_src)
+--     if ar.currentline > 0 then p("%d:", ar.currentline) end
+--     if ar.namewhat ~= ""  then p(" in function '%s'", ar.name) else
+--       if ar.what == "main" then p(" in main chunk")
+--       elseif ar.what == "C" or ar.what == "tail" then p(" ?")
+--       else p(" in function <%s:%d>", ar.short_src, ar.linedefined)
+--       end
+--     end
+--     return s
+--   end
+-- errorfb_lines = function (a, b, step, f)
+--     local T = {}
+--     for level=a,b,(step or 1) do
+--       T[#T+1] = (f or errorfb_line)(debug.getinfo(level))
+--     end
+--     return table.concat(T, "\n")
+--   end
+
 
 
 -- «interactor»  (to ".interactor")
@@ -3027,8 +2994,6 @@ ydb_sort = function (bigstr)
     return table.concat(sorted(lines, lt), "\n")
   end
 ydb_sort1 = function () print(ydb_sort(io.read("*a"))) end
---[[
---]]
 
 
 -- «loaddednat6» (to ".loaddednat6")

@@ -2,9 +2,13 @@
 ;;   http://angg.twu.net/emacs-lua/emlua-init.el.html
 ;;   http://angg.twu.net/emacs-lua/emlua-init.el
 ;;           (find-angg "emacs-lua/emlua-init.el")
+;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-init.el
+;;           https://github.com/edrx/emlua/blob/main/emlua-init.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
+;; Version: 2022mar26
+;; License: GPL2
 ;;
-;; (defun e () (interactive) (find-angg "emacs-lua/emlua-init.el"))
+;; See: https://github.com/edrx/emlua
 
 
 
@@ -15,38 +19,47 @@
 	  (file-name-directory load-file-name)
 	default-directory))
 
-(defun emlua-init-0 ()
-  (load (concat emlua-dir "emlua.so"))) 
 
-(defun emlua-init-1 ()
+
+;; Tests: (emlua-init-so-0)
+;;        (emlua-init-so)
+;;
+(defun emlua-init-so-0 ()
+  (concat emlua-dir "emlua.so"))
+
+(defun emlua-init-so ()
   (if (not (fboundp 'emlua-dostring))
-      (emlua-init-0)
-    "Already loaded"))
+      (load (emlua-init-so-0))
+    "emlua.so already loaded"))
 
-(defun emlua-init-2 ()
+
+
+;; Tests: (emlua-init-dofiles-0)
+;;        (emlua-init-dofiles)
+;;
+(defun emlua-init-dofiles-0 ()
   (ee-template0 "\
-     loadstring = loadstring or load
      dofile '{emlua-dir}edrxlib.lua'
      dofile '{emlua-dir}Repl1.lua'
      -- package.path = '{emlua-dir}?.lua;'..package.path
-     REPL = EdrxEmacsRepl.new()
-     return 'REPL =', REPL"))
+     return 'EdrxEmacsRepl =', EdrxEmacsRepl"))
 
-(defun emlua-init-3 ()
-  (emlua-init-1)
-  (emlua-dostring (emlua-init-2)))
-
-(defun emlua-init ()
-  (emlua-init-3))
+(defun emlua-init-dofiles ()
+  (emlua-dostring (emlua-init-dofiles-0)))
 
 
-;; Tests:
-;; emlua-dir
-;; (emlua-init-0)
-;; (emlua-init-1)
-;; (emlua-init-2)
-;; (emlua-init-3)
-;; (emlua-init)
+
+;; Tests: (emlua-init-newrepl-0)
+;;        (emlua-init-newrepl)
+;;
+(defun emlua-init-newrepl-0 ()
+  "REPL = EdrxEmacsRepl.new()
+   return 'REPL =', REPL")
+
+(defun emlua-init-newrepl ()
+  (emlua-dostring (emlua-init-newrepl-0)))
+
+
 
 
 (provide 'emlua-init)
