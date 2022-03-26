@@ -225,6 +225,9 @@ myunpack = function (arg) return unpack(arg, 1, arg.n) end
 -- «printf»  (to ".printf")
 printf = function (...) write(format(...)) end
 
+-- (find-es "lua5" "loadstring")
+loadstring = loadstring or load
+
 
 
 -- «ee_expand»  (to ".ee_expand")
