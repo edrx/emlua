@@ -361,6 +361,12 @@ bar
 --")
 
 
+
+
+
+
+
+
 ;;;                  _ _       _                          _             
 ;;;   ___  ___ _ __ (_) |_ ___| |__         ___ _ __ ___ | |_   _  __ _ 
 ;;;  / _ \/ _ \ '_ \| | __/ __| '_ \ _____ / _ \ '_ ` _ \| | | | |/ _` |
@@ -378,7 +384,12 @@ bar
 	   (eepitch-emlua-eprompt))))
 
 (defun eepitch-emlua ()
-  "Setup eepitch-ing to an emlua buffer."
+  "Setup eepitch-ing to an inferior Lua.
+The \"inferior Lua\" is not a process associated to the *emlua*
+buffer - it is a Lua interpreter. We exchange data with it using
+`emlua-dostring', and we use the *emlua* buffer as a log of our
+communications with it. See the source of `eepitch-line-emlua' to
+understand what happens when we send a line to the inferior Lua."
   (interactive)
   (defalias 'emlua-do 'emlua-do-b)
   (prog1 (eepitch '(find-emluabuffer))
@@ -403,6 +414,13 @@ PPP(EdrxEmacsRepl)
 PPPV(EdrxEmacsRepl.__index)
 
 --")
+
+
+
+
+
+
+
 
 
 
