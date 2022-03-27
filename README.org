@@ -176,6 +176,42 @@ of the file should be clear enough, and the test blocks should be easy
 to test (I hope). There is a screenshot [[http://angg.twu.net/IMAGES/2022eepitch-emlua-0.png][here]].
 
 
+* Testing everything
+
+You should probably be able to test everything in just three steps: 1)
+copy the block below to an Emacs buffer, 2) adjust the ~EMACS_DIR~, 3)
+run the block by typing @@html:<kbd>&lt;f8&gt;</kbd>@@ on each line.
+The bullets will behave as red stars, as explained [[http://angg.twu.net/2020-list-packages-eev-nav.html#f8][here]].
+
+#+begin_src
+• (eepitch-shell)
+• (eepitch-kill)
+• (eepitch-shell)
+rm -Rfv /tmp/emlua/
+mkdir   /tmp/emlua/
+cd      /tmp/emlua/
+git clone https://github.com/edrx/emlua .
+make EMACS_DIR=$HOME/bigsrc/emacs29
+
+• (add-to-list 'load-path "/tmp/emlua/")
+• (require 'emlua-repl)
+• (emlua-init)
+• (eepitch-emlua)
+• (eepitch-kill)
+• (eepitch-emlua)
+print(2 + 3)
+print(2 +
+      3 +
+      4)
+= 2,
+  3,
+  4
+= 2 + nil
+= EdrxEmacsRepl
+PPP(EdrxEmacsRepl)
+PPPV(EdrxEmacsRepl.__index)
+#+end_src
+
 
 
 
