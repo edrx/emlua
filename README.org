@@ -19,6 +19,11 @@
 # (defun cv () (interactive) (c) (v))
 # (defun m  () (interactive) (magit-status "~/emlua/"))
 # 
+# (find-fline "~/usrc/org-git-hooks/build.el")
+# (require 'ox-md)
+# (org-md-export-to-markdown)
+# (org-html-export-to-html)
+# 
 # (find-fline   "~/emlua/")
 # (magit-status "~/emlua/")
 # (find-gitk    "~/emlua/")
@@ -185,8 +190,8 @@ Here is a [[http://angg.twu.net/IMAGES/2022eepitch-emlua-0.png][screenshot]],
 
 You should probably be able to test everything in just three steps: 1)
 copy the block below to an Emacs buffer, 2) adjust the ~EMACS_DIR~, 3)
-run the block by typing the key f8 on each line. The bullets will
-behave as [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6.1][red stars]], as explained [[http://angg.twu.net/2020-list-packages-eev-nav.html#f8][here]].
+run the block by typing @@html:<kbd>&lt;f8&gt;</kbd>@@ on each line.
+The bullets will behave as [[http://angg.twu.net/eev-intros/find-eev-quick-intro.html#6.1][red stars]], as explained [[http://angg.twu.net/2020-list-packages-eev-nav.html#f8][here]].
 
 #+begin_src
 • (eepitch-shell)
@@ -220,7 +225,7 @@ PPPV(EdrxEmacsRepl.__index)
 
 * This is a prototype
 
-At this moment ~emlua~ isn't very useful per se, but it is very easy
+At this moment ~emlua~ isn't very useful /per se/, but it is very easy
 to hack and extend.
 
 
