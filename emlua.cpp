@@ -6,6 +6,8 @@
 //           https://github.com/edrx/emlua/blob/main/emlua.cpp
 // Authors: <nerditation@outlook.com> (part in C++),
 //          <eduardoochs@gmail.com> (all the rest).
+// See: http://lua-users.org/lists/lua-l/2021-03/msg00084.html
+//      https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg00907.html
 // Version: 2022mar25
 // License: GPL2
 //
