@@ -5,7 +5,7 @@
 ;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-init.el
 ;;           https://github.com/edrx/emlua/blob/main/emlua-init.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
-;; Version: 2022mar26
+;; Version: 2022mar27
 ;; License: GPL2
 ;;
 ;; See: https://github.com/edrx/emlua
@@ -60,6 +60,14 @@
   (emlua-dostring (emlua-init-newrepl-0)))
 
 
+
+;; Test: (emlua-init)
+;;
+(defun emlua-init ()
+  (list (emlua-init-so)
+        (emlua-init-dofiles)
+        (emlua-init-newrepl)))
+        
 
 
 (provide 'emlua-init)

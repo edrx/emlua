@@ -161,19 +161,23 @@
 ;; «faces»  (to ".faces")
 ;;
 (defface emlua-prompt-face
-  '((t (:foreground "RoyalBlue3")))
+  '((((background dark))  :foreground "RoyalBlue3")
+    (((background light)) :foreground "RoyalBlue3"))
   "")
 
 (defface emlua-user-input-face
-  '((t (:foreground "orange1")))
+  '((((background dark))  :foreground "orange1")
+    (((background light)) :foreground "DarkOrange"))
   "")
 
 (defface emlua-output-face
-  '((t (:foreground "bisque")))
+  '((((background dark))  :foreground "bisque")
+    (((background light)) :foreground "SaddleBrown"))
   "")
 
 (defface emlua-error-face
-  '((t (:foreground "red")))
+  '((((background dark))  :foreground "red")
+    (((background light)) :foreground "red"))
   "")
 
 
