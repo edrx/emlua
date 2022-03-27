@@ -11,7 +11,16 @@
 // Version: 2022mar25
 // License: GPL2
 //
-// See: https://github.com/edrx/emlua
+// See: <https://github.com/edrx/emlua>.
+//
+// TODO: at this moment this module needs to be loaded with (load ...) -
+// running (require 'emlua) won't work. This is because this file
+// lacks something like the call to "provide" here,
+//
+//   https://github.com/akermu/emacs-libvterm/blob/master/vterm-module.c#L1514
+//
+// that would work like a (provide 'emlua), but written in C.
+//
 //
 // «.tests-in-tmp»	(to "tests-in-tmp")
 // «.tests-edrx»	(to "tests-edrx")

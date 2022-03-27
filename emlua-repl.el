@@ -5,16 +5,91 @@
 ;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-repl.el
 ;;           https://github.com/edrx/emlua/blob/main/emlua-repl.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
-;; Version: 2022mar26
+;; Version: 2022mar27
 ;; License: GPL2
 ;;
-;; See: https://github.com/edrx/emlua
+;; See: <https://github.com/edrx/emlua>.
 
-;; This file implements `eepitch-emlua', that is an eepitch whose
-;; target is a Lua interpreter running in a dynamic module loaded by
-;; Emacs. The interaction with that interpreter is shown in a buffer
-;; called "*emlua*".
+
+;; Introduction
+;; ============
+;; This file implements `eepitch-emlua' and several variants of it -
+;; i.e., it implements "several different `eepitch-emlua's".
 ;;
+;; All these `eepitch-emlua's pitch things to the emlua buffer, and
+;; this GENERALLY means that they talk to a Lua interpreter via
+;; `emlua-dostring' and then use the emlua buffer as a kind of log of
+;; the communication. This screenshot shows how this is _typically_
+;; used:
+;;
+;;   http://angg.twu.net/IMAGES/2022eepitch-emlua-0.png
+;;
+;; BUT: the emlua buffer is just a log buffer, and to keep the code
+;; simple I keep it in fundamental mode. This means that RET there is
+;; not special: typing, say,
+;;
+;;   print(2+3)
+;;
+;; after a prompt in the emlua buffer and then typing RET does not
+;; send the "print(2+3)" to the Lua interpreter, or anywhere - the RET
+;; just inserts a "\n".
+;;
+;; Remember that `eepitch-shell' sets up a target buffer running an
+;; "inferior shell". See:
+;;
+;;   (find-eev-quick-intro "6. Controlling shell-like programs")
+;;   (find-enode "Major Modes" "inferior shell process")
+;;   (find-enode "Interactive Shell")
+;;
+;; Here are the first two paragraphs of the page "Interactive Shell":
+;;
+;;   To run a subshell interactively, type ‘M-x shell’. This creates
+;;   (or reuses) a buffer named ‘*shell*’, and runs a shell subprocess
+;;   with input coming from and output going to that buffer. That is
+;;   to say, any terminal output from the subshell goes into the
+;;   buffer, advancing point, and any terminal input for the subshell
+;;   comes from text in the buffer. To give input to the subshell, go
+;;   to the end of the buffer and type the input, terminated by <RET>.
+;;   
+;;   By default, when the subshell is invoked interactively, the
+;;   ‘*shell*’ buffer is displayed in a new window, unless the current
+;;   window already shows the ‘*shell*’ buffer. This behavior can be
+;;   customized via ‘display-buffer-alist’.
+;;
+;; In this file the notion "inferior Lua" will be kept deliberately
+;; vague: the meaning of "sending (something) the the inferior Lua"
+;; will depend on the context, and _can be modified at will_. In most
+;; cases it means:
+;;
+;;   send [this] to the REPL running in the Lua interpreter showing
+;;   [this] in the log buffer, and then show in the log buffer the
+;;   answer of the Lua interpreter and the next prompt
+;;
+;; but the details of this "send" can change, and the REPL can change
+;; - for example, Technomancy is experimenting with REPLs based on
+;; coroutines, and I am making some experiments with REPLs that send
+;; text with properties back to Emacs - and in same cases we perform
+;; tests using fake REPLs that always answer the same string.
+;;
+;;
+;; `emlua-do'
+;; ==========
+;; One of the main building blocks of this file is the function
+;; `emlua-do', whose semantics can also be changed. In principle
+;;
+;;   (emlua-do '(foo bar))
+;;
+;; evals `(foo bar)' inside the emlua buffer, but this can mean
+;; something full of add-ons, like "make sure that the emlua buffer
+;; exists, is initialized, and is shown in a visible window, and run
+;; `(foo bar)' there with the point at the end of the buffer".
+;;
+;; Right now the behavior of `emlua-do' is changed by defalias-ing it
+;; to different functions.
+
+
+;; An older description:
+;; ---------------------
 ;; Note: this is my N-th attempt (for N big!) of rewriting this file
 ;; to make its code easy to understand... but it still needs more
 ;; rewrites, and lots of explanations and tests. In particular, 1) I
@@ -40,12 +115,20 @@
 ;; 
 ;;   (find-eev "eepitch.el" "eepitch-this-line")
 
+
+
 ;; «.faces»			(to "faces")
+;; «.find-emluabuffer»		(to "find-emluabuffer")
+;; «.emlua-do»			(to "emlua-do")
+;; «.emlua-insert»		(to "emlua-insert")
+;; «.eepitch-emlua-fake1»	(to "eepitch-emlua-fake1")
+
 ;; «.find-buffer»		(to "find-buffer")
 ;; «.prep»			(to "prep")
 ;; «.insert»			(to "insert")
 ;; «.eepitch-emlua-fakesend»	(to "eepitch-emlua-fakesend")
 ;; «.esend»			(to "esend")
+;; «.eepitch-emlua»		(to "eepitch-emlua")
 ;; «.eepitch-emlua»		(to "eepitch-emlua")
 
 
@@ -96,60 +179,68 @@
 
 
 
+
 ;;;   __ _           _       _            __  __           
 ;;;  / _(_)_ __   __| |     | |__  _   _ / _|/ _| ___ _ __ 
 ;;; | |_| | '_ \ / _` |_____| '_ \| | | | |_| |_ / _ \ '__|
 ;;; |  _| | | | | (_| |_____| |_) | |_| |  _|  _|  __/ |   
 ;;; |_| |_|_| |_|\__,_|     |_.__/ \__,_|_| |_|  \___|_|   
 ;;;                                                        
-;; «find-buffer»  (to ".find-buffer")
-;; Tests: (eepitch-emlua-insert-prepare)
-;;        (eepitch-emlua-insert-user-input "foo")
-;;        (eepitch-emlua-insert-output "bar plic\n")
-;;        (eepitch-emlua-insert-prompt ">-> ")
+;; «find-emluabuffer»  (to ".find-emluabuffer")
 
-(defun eepitch-emlua-buffer ()
+(defun emlua-buffer ()
+  "Return the *emlua* buffer, or nil if it doesn't exist."
   (get-buffer "*emlua*"))
 
-(defun eepitch-emlua-initial-prompt ()
+(defun emlua-buffer-initial-prompt ()
   (propertize "Emlua:\n>>> " 'face 'emlua-prompt-face))
 
-(defun eepitch-emlua-find-buffer ()
-  "Like `(find-ebuffer \"*emlua*\")', but also initializes the
-buffer if it does not exist."
-  (if (eepitch-emlua-buffer)
+(defun find-emluabuffer ()
+  "Go to the *emlua* buffer, and make sure it's initialized."
+  (if (emlua-buffer)
       (find-ebuffer "*emlua*")
     (find-ebuffer "*emlua*")
-    (insert (eepitch-emlua-initial-prompt))))
+    (insert (emlua-buffer-initial-prompt))))
 
-
-
-
-;;;                       
-;;;  _ __  _ __ ___ _ __  
-;;; | '_ \| '__/ _ \ '_ \ 
-;;; | |_) | | |  __/ |_) |
-;;; | .__/|_|  \___| .__/ 
-;;; |_|            |_|    
+;; Other basic tools:
 ;;
-;; «prep»  (to ".prep")
-
-(defun eepitch-emlua-window ()
+(defun emlua-window ()
+  "Return a window with the *emlua* buffer, or nil if it doesn't exist."
   (get-buffer-window "*emlua*"))
 
-(defun eepitch-emlua-prep-b ()
-  "Prepare eepitch-emlua - buffer-only version"
-  (eepitch-emlua-find-buffer))
+(defun emlua-buffer-kill ()
+  (if (emlua-buffer) (ee-kill-buffer (emlua-buffer))))
 
-(defun eepitch-emlua-prep-bw ()
-  "Prepare eepitch-emlua - buffer+window version"
-  (if (eepitch-emlua-window)
-      "Everything ready"
-    (find-2a nil '(eepitch-emlua-find-buffer))))
 
-;; Choose one:
-(defalias 'eepitch-emlua-prep 'eepitch-emlua-prep-b)
-(defalias 'eepitch-emlua-prep 'eepitch-emlua-prep-bw)
+
+;;;                 _                       _       
+;;;   ___ _ __ ___ | |_   _  __ _        __| | ___  
+;;;  / _ \ '_ ` _ \| | | | |/ _` |_____ / _` |/ _ \ 
+;;; |  __/ | | | | | | |_| | (_| |_____| (_| | (_) |
+;;;  \___|_| |_| |_|_|\__,_|\__,_|      \__,_|\___/ 
+;;;                                                 
+;; «emlua-do»  (to ".emlua-do")
+
+(defun emlua-do-b (code)
+  (find-emluabuffer)
+  (goto-char (point-max))
+  (eval code))
+
+(defun emlua-do-bs (code)
+  (save-excursion
+    (find-emluabuffer)
+    (goto-char (point-max))
+    (eval code)))
+
+(defun emlua-do-w (code)
+  (if (not (emlua-window))
+      (find-2a nil '(find-emluabuffer)))
+  (save-selected-window
+    (select-window (emlua-window))
+    (goto-char (point-max))
+    (eval code)))
+
+(defalias 'emlua-do 'emlua-do-bs)
 
 
 
@@ -159,61 +250,62 @@ buffer if it does not exist."
 ;;; | | | | \__ \  __/ |  | |_ 
 ;;; |_|_| |_|___/\___|_|   \__|
 ;;;                            
-;; «insert»  (to ".insert")
+;; «emlua-insert»  (to ".emlua-insert")
 
-(defun eepitch-emlua-insert-b (str &optional face)
-  "Insert STR at the end of the emlua buffer - buffer-only version"
-  (eepitch-emlua-prep-b)
-  (goto-char (point-max))
-  (insert (propertize str 'face face)))
+(defun emlua-insert (str &optional face)
+  (emlua-do `(insert ,(propertize str 'face face))))
 
-(defun eepitch-emlua-insert-bw (str &optional face)
-  "Insert STR at the end of the emlua buffer - buffer+window version"
-  (eepitch-emlua-prep-bw)
-  (eepitch-emlua-insert-b str face))
+(defun emlua-insert-prompt (prompt)
+  (emlua-insert prompt 'emlua-prompt-face))
 
-;; Choose one:
-(defalias 'eepitch-emlua-insert 'eepitch-emlua-insert-b)
-(defalias 'eepitch-emlua-insert 'eepitch-emlua-insert-bw)
+(defun emlua-insert-user-input (line)
+  (emlua-insert (concat line "\n") 'emlua-user-input-face))
 
-(defun eepitch-emlua-insert-prompt (prompt)
-  (eepitch-emlua-insert prompt 'emlua-prompt-face))
+(defun emlua-insert-output (output)
+  (emlua-insert output 'emlua-output-face))
 
-(defun eepitch-emlua-insert-user-input (line)
-  (eepitch-emlua-insert (concat line "\n") 'emlua-user-input-face))
-
-(defun eepitch-emlua-insert-output (output)
-  (eepitch-emlua-insert output 'emlua-output-face))
-
-(defun eepitch-emlua-insert-error (err)
-  (eepitch-emlua-insert err 'emlua-error-face))
-
-
-
-
-
-;;;   __       _                            _ 
-;;;  / _| __ _| | _____  ___  ___ _ __   __| |
-;;; | |_ / _` | |/ / _ \/ __|/ _ \ '_ \ / _` |
-;;; |  _| (_| |   <  __/\__ \  __/ | | | (_| |
-;;; |_|  \__,_|_|\_\___||___/\___|_| |_|\__,_|
-;;;                                           
-;; «eepitch-emlua-fakesend»  (to ".eepitch-emlua-fakesend")
-
-(defun eepitch-emlua-fakesend (line)
-  (eepitch-eval-at-target-window
-   '(progn
-      ;; (save-excursion (eepitch-emlua-prep-b))
-      (eepitch-emlua-prep-b)
-      (eepitch-emlua-insert-user-input line)
-      (eepitch-emlua-insert-output "(Using fakesend)\n")
-      (eepitch-emlua-insert-prompt ">>> "))))
+(defun emlua-insert-error (err)
+  (emlua-insert err 'emlua-error-face))
 
 
 '("This is a test block:
- (eepitch-emlua-fakesend)
+ (emlua-buffer-kill)
+ (defalias 'emlua-do 'emlua-do-w)
+ (emlua-do nil)
+ (emlua-insert-user-input "foo")
+ (emlua-insert-output "bar\n")
+ (emlua-insert-prompt ">-> ")
+
+--")
+
+
+
+
+;;;   __       _        _ 
+;;;  / _| __ _| | _____/ |
+;;; | |_ / _` | |/ / _ \ |
+;;; |  _| (_| |   <  __/ |
+;;; |_|  \__,_|_|\_\___|_|
+;;;                       
+;; «eepitch-emlua-fake1»  (to ".eepitch-emlua-fake1")
+
+(defun eepitch-line-emlua-fake1 (line)
+  (eepitch-eval-at-target-window
+   `(progn (emlua-insert-user-input ,line)
+	   (emlua-insert-output "(emlua-fake1 output)\n")
+	   (emlua-insert-prompt ">-> "))))
+
+(defun eepitch-emlua-fake1 ()
+  (interactive)
+  (defalias 'emlua-do 'emlua-do-b)
+  (prog1 (eepitch '(find-emluabuffer))
+    (setq eepitch-line 'eepitch-line-emlua-fake1)))
+
+
+'("This is a test block:
+ (eepitch-emlua-fake1)
  (eepitch-kill)
- (eepitch-emlua-fakesend)
+ (eepitch-emlua-fake1)
 foo
 bar
 
@@ -242,27 +334,27 @@ bar
 (defun eepitch-emlua-esend1 ()
   "Insert the contents of `eepitch-emlua-out' in the right way."
   (if (stringp eepitch-emlua-out)
-      (eepitch-emlua-insert-error (concat eepitch-emlua-out "\n"))
-    (if (< 0 (length eepitch-emlua-out))
-	(eepitch-emlua-insert-output (aref eepitch-emlua-out 0))
-      "eepitch-emlua-out is []: do nothing")))
+      (emlua-insert-error (concat eepitch-emlua-out "\n"))
+    (if (= 0 (length eepitch-emlua-out))
+	"eepitch-emlua-out is []: do nothing"
+      (emlua-insert-output (aref eepitch-emlua-out 0)))))
 
 (defun eepitch-emlua-eprompt ()
   "Insert the result of REPL:eprompt() at the end of the *emlua* buffer."
-  (eepitch-emlua-insert-prompt
+  (emlua-insert-prompt
    (aref (emlua-dostring "return REPL:eprompt()") 0)))
 
-(defun eepitch-emlua-esend (line)
-  (eepitch-eval-at-target-window
-   '(progn
-      (eepitch-emlua-prep-b)
-      (eepitch-emlua-insert-user-input line)
-      (eepitch-emlua-esend0 line)
-      (eepitch-emlua-esend1)
-      (eepitch-emlua-eprompt))))
 
+'("This is a test block:
+ (defalias 'emlua-do 'emlua-do-w)
+ (emlua-buffer-kill)
+ (find-2a nil '(find-emluabuffer)))
+ (emlua-insert-user-input "= 22+33")
+ (eepitch-emlua-esend0    "= 22+33")
+ (eepitch-emlua-esend1)
+ (eepitch-emlua-eprompt)
 
-
+--")
 
 
 ;;;                  _ _       _                          _             
@@ -274,14 +366,19 @@ bar
 ;;
 ;; «eepitch-emlua»  (to ".eepitch-emlua")
 
+(defun eepitch-line-emlua (line)
+  (eepitch-eval-at-target-window
+   `(progn (emlua-insert-user-input ,line)
+	   (eepitch-emlua-esend0    ,line)
+	   (eepitch-emlua-esend1)
+	   (eepitch-emlua-eprompt))))
+
 (defun eepitch-emlua ()
   "Setup eepitch-ing to an emlua buffer."
   (interactive)
-  (defalias 'eepitch-emlua-prep   'eepitch-emlua-prep-b)
-  (defalias 'eepitch-emlua-insert 'eepitch-emlua-insert-b)
-  (eepitch '(eepitch-emlua-find-buffer))
-  (setq eepitch-line 'eepitch-emlua-esend)
-  )
+  (defalias 'emlua-do 'emlua-do-b)
+  (prog1 (eepitch '(find-emluabuffer))
+    (setq eepitch-line 'eepitch-line-emlua)))
 
 
 
@@ -309,6 +406,7 @@ PPPV(EdrxEmacsRepl.__index)
 ;; TODO: rewrite this idea, that was from an older version...
 ;; (defun emlua-eval-this ()
 ;;   (eval (ee-read (aref (emlua-dostring "return eval_this") 0))))
+
 
 (provide 'emlua-repl)
 
