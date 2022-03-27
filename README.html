@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2022-03-27 Sun 19:04 -->
+<!-- 2022-03-27 Sun 19:18 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Emlua: run Lua in Emacs as a module</title>
@@ -218,8 +218,16 @@ non-invasive package</a> and it is easy to turn eev-mode on and off, so,
 ahem, "everybody should have eev installed". 🙃
 </p>
 
-<div id="outline-container-org61c1e25" class="outline-2">
-<h2 id="org61c1e25"><span class="section-number-2">1.</span> The low-level way</h2>
+<p>
+Here is a screenshot - click on it to enlarge:
+</p>
+
+<p>
+<a href="2022eepitch-emlua-0.png"><IMG SRC="2022eepitch-emlua-0-small.png"></a>
+</p>
+
+<div id="outline-container-org667295d" class="outline-2">
+<h2 id="org667295d"><span class="section-number-2">1.</span> The low-level way</h2>
 <div class="outline-text-2" id="text-1">
 <p>
 The low-level way to test Emlua is to run the test blocks in
@@ -287,8 +295,8 @@ of strings in case of success, and a string in the case of errors.
 
 
 
-<div id="outline-container-org36cff3b" class="outline-2">
-<h2 id="org36cff3b"><span class="section-number-2">2.</span> Exchanging data</h2>
+<div id="outline-container-orga8b075d" class="outline-2">
+<h2 id="orga8b075d"><span class="section-number-2">2.</span> Exchanging data</h2>
 <div class="outline-text-2" id="text-2">
 <p>
 The file <a href="http://angg.twu.net/emlua/emlua-data.el.html"><code>emlua-data.el</code></a> implements a very basic way to send strings
@@ -307,8 +315,8 @@ and numbers to Lua code. After loading it we can set the Lua variables
 
 
 
-<div id="outline-container-org973fc78" class="outline-2">
-<h2 id="org973fc78"><span class="section-number-2">3.</span> Two Lua REPLs written in Lua</h2>
+<div id="outline-container-orgde44a5c" class="outline-2">
+<h2 id="orgde44a5c"><span class="section-number-2">3.</span> Two Lua REPLs written in Lua</h2>
 <div class="outline-text-2" id="text-3">
 <p>
 The file <a href="http://angg.twu.net/emlua/Repl1.lua.html">Repl1.lua</a> contains two Lua REPLs written in Lua. They can
@@ -335,8 +343,8 @@ string.
 
 
 
-<div id="outline-container-org36f9a89" class="outline-2">
-<h2 id="org36f9a89"><span class="section-number-2">4.</span> The file emlua-init.el</h2>
+<div id="outline-container-orgac52fc8" class="outline-2">
+<h2 id="orgac52fc8"><span class="section-number-2">4.</span> The file emlua-init.el</h2>
 <div class="outline-text-2" id="text-4">
 <p>
 The file <a href="http://angg.twu.net/emlua/emlua-init.el.html">emlua-init.el</a> contains functions that load the lua module,
@@ -357,8 +365,8 @@ Try:
 
 
 
-<div id="outline-container-orgdc98763" class="outline-2">
-<h2 id="orgdc98763"><span class="section-number-2">5.</span> Accessing the files with code-c-d</h2>
+<div id="outline-container-org8e2f317" class="outline-2">
+<h2 id="org8e2f317"><span class="section-number-2">5.</span> Accessing the files with code-c-d</h2>
 <div class="outline-text-2" id="text-5">
 <p>
 If you understand how to create "<a href="http://angg.twu.net/eev-intros/find-eev-quick-intro.html#9">short hyperlinks</a>" with <a href="http://angg.twu.net/eev-intros/find-eev-quick-intro.html#9.1"><code>code-c-d</code></a> in
@@ -381,8 +389,8 @@ directory:
 </div>
 
 
-<div id="outline-container-org2418d60" class="outline-2">
-<h2 id="org2418d60"><span class="section-number-2">6.</span> Running the Lua REPL in Emacs</h2>
+<div id="outline-container-orgd838c59" class="outline-2">
+<h2 id="orgd838c59"><span class="section-number-2">6.</span> Running the Lua REPL in Emacs</h2>
 <div class="outline-text-2" id="text-6">
 <p>
 The file <a href="http://angg.twu.net/emlua/emlua-repl.el.html"><code>emlua-repl.el</code></a> defines a function called <a href="http://angg.twu.net/emlua/emlua-repl.el.html#eepitch-emlua"><code>eepitch-emlua</code></a>,
@@ -398,8 +406,8 @@ Here is a <a href="http://angg.twu.net/IMAGES/2022eepitch-emlua-0.png">screensho
 </div>
 
 
-<div id="outline-container-orgd88785a" class="outline-2">
-<h2 id="orgd88785a"><span class="section-number-2">7.</span> Testing everything</h2>
+<div id="outline-container-org93240d5" class="outline-2">
+<h2 id="org93240d5"><span class="section-number-2">7.</span> Testing everything</h2>
 <div class="outline-text-2" id="text-7">
 <p>
 You should probably be able to test everything in just three steps: 1)
@@ -440,8 +448,8 @@ PPPV(EdrxEmacsRepl.__index)
 </div>
 
 
-<div id="outline-container-orgf5b07d0" class="outline-2">
-<h2 id="orgf5b07d0"><span class="section-number-2">8.</span> This is a prototype</h2>
+<div id="outline-container-orgf4ddf9f" class="outline-2">
+<h2 id="orgf4ddf9f"><span class="section-number-2">8.</span> This is a prototype</h2>
 <div class="outline-text-2" id="text-8">
 <p>
 At this moment <code>emlua</code> isn't very useful <i>per se</i>, but it is very easy

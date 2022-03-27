@@ -13,6 +13,10 @@ comments](http://angg.twu.net/eev-intros/find-eev-quick-intro.html#3), so you wi
 non-invasive package](http://angg.twu.net/eev-intros/find-eev-intro.html#1) and it is easy to turn eev-mode on and off, so,
 ahem, "everybody should have eev installed". 🙃
 
+Here is a screenshot - click on it to enlarge:
+
+<a href="2022eepitch-emlua-0.png"><IMG SRC="2022eepitch-emlua-0-small.png"></a>
+
 
 # The low-level way
 
