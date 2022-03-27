@@ -217,6 +217,12 @@ PPPV(EdrxEmacsRepl.__index)
 #+end_src
 
 
+* This is a prototype
+
+At this moment ~emlua~ isn't very useful per se, but it is very easy
+to hack and extend.
+
+
 
 
 # Local Variables:
