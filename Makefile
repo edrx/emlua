@@ -10,11 +10,12 @@
 #
 # See: https://github.com/edrx/emlua
 
-EMACS_DIR ?= "$(HOME)/src/emacs"
+EMACS_DIR       ?= "$(HOME)/src/emacs"
 LUA_INCLUDE_DIR ?= /usr/include/lua5.3
+LUA_LIB         ?= lua5.3
 
 emlua.so:
-	g++ -I$(EMACS_DIR)/src -I$(LUA_INCLUDE_DIR) -shared emlua.cpp -o $@ -llua5.3
+	g++ -std=c++11 -I$(EMACS_DIR)/src -I$(LUA_INCLUDE_DIR) -shared emlua.cpp -o $@ -l$(LUA_LIB)
 
 clean:
 	rm -fv emlua.so

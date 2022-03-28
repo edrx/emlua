@@ -10,7 +10,7 @@
 # Version: 2022mar28
 # License: GPL2
 # 
-# See: https://github.com/edrx/emlua
+# See: <https://github.com/edrx/emlua>.
 # 
 # Some eev-isms:
 # (defun c  () (interactive) (eek "C-c C-e h h"))
