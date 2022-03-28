@@ -41,6 +41,8 @@
 
 #+TITLE: Emlua: run Lua in Emacs as a module
 
+* Introduction
+
 Emlua implements a /very minimalistic/ way to run a Lua interpreter
 inside Emacs /as a module/. Running a Lua REPL in Emacs [[http://www.gnu.org/software/emacs/manual/html_node/emacs/Interactive-Shell.html][in a shell
 buffer]] is trivial - see [[http://angg.twu.net/LATEX/2021emacsconf.pdf#page=3][these slides]], the [[http://angg.twu.net/emacsconf2021.html][page]] of my presentation at
