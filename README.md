@@ -163,3 +163,23 @@ The bullets will behave as [red stars](http://angg.twu.net/eev-intros/find-eev-q
 At this moment `emlua` isn't very useful *per se*, but it is very easy
 to hack and extend.
 
+
+# Ideas
+
+In Agda the same symbol can have different meanings depending on the
+context, and the key <kbd>M-,</kbd> can be used to go the
+source code of the symbol at point. This is implemented by storing the
+location of the source of each symbol in a buffer in its [text
+properties](http://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html). See the screenshot below (click to enlarge it):
+
+<a href="2022agda-mode-prop.png"><IMG SRC="2022agda-mode-prop-small.png"></a>
+
+The function [`emlua-dostring+`](http://angg.twu.net/emlua/emlua-repl.el.html#emlua-dostring+) in `emlua-repl.el` executes Lua code
+and interprets the result as elisp code to be executed by Emacs. We
+can use it to generate text with properties, and we can use
+`eepitch-emlua` to develop interactively the Lua functions that we
+will call using `emlua-dostring+`.
+
+Emacs can display SVG images - see the packages [svg](https://elpa.gnu.org/packages/svg.html) and [sketch-mode](https://github.com/dalanicolai/sketch-mode) -
+and we can use `emlua-dostring+` to create and modify SVG images.
+

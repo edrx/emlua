@@ -5,7 +5,7 @@
 ;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-repl.el
 ;;           https://github.com/edrx/emlua/blob/main/emlua-repl.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
-;; Version: 2022mar27
+;; Version: 2022mar28
 ;; License: GPL2
 ;;
 ;; See: <https://github.com/edrx/emlua>.
@@ -129,7 +129,7 @@
 ;; «.eepitch-emlua-fakesend»	(to "eepitch-emlua-fakesend")
 ;; «.esend»			(to "esend")
 ;; «.eepitch-emlua»		(to "eepitch-emlua")
-;; «.eepitch-emlua»		(to "eepitch-emlua")
+;; «.emlua-dostring+»		(to "emlua-dostring+")
 
 
 
@@ -420,14 +420,32 @@ PPPV(EdrxEmacsRepl.__index)
 
 
 
+;;;      _           _        _                   
+;;;   __| | ___  ___| |_ _ __(_)_ __   __ _   _   
+;;;  / _` |/ _ \/ __| __| '__| | '_ \ / _` |_| |_ 
+;;; | (_| | (_) \__ \ |_| |  | | | | | (_| |_   _|
+;;;  \__,_|\___/|___/\__|_|  |_|_| |_|\__, | |_|  
+;;;                                   |___/       
+;;
+;; «emlua-dostring+»  (to ".emlua-dostring+")
+;; This is like emlua-dostring, but it treats the result as elisp code
+;; that has to be eval-ed. Note: this is just a demo! Please redefine
+;; this function and reuse its name!
+
+(defun emlua-dostring+ (luacode)
+  (let ((results (emlua-dostring luacode)))
+    (if (stringp results)
+	(error "%s" results)
+      (let ((result (aref results 0)))
+	(eval (read result))))))
+
+;; Tests: (emlua-dostring+ "return '(+ 22 33)'")
+;; Tests: (emlua-dostring+ "return '(insert \"\\n;; HELLO\")'")
+;; Tests: (emlua-dostring+ "return  -- no return values")
+;; Tests: (emlua-dostring+ "!!! a syntax error !!!")
 
 
 
-
-
-;; TODO: rewrite this idea, that was from an older version...
-;; (defun emlua-eval-this ()
-;;   (eval (ee-read (aref (emlua-dostring "return eval_this") 0))))
 
 
 (provide 'emlua-repl)

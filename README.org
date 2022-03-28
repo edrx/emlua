@@ -7,7 +7,7 @@
 # https://raw.githubusercontent.com/edrx/emlua/main/README.org
 #           https://github.com/edrx/emlua/blob/main/README.org
 # Author: Eduardo Ochs <eduardoochs@gmail.com>
-# Version: 2022mar26
+# Version: 2022mar28
 # License: GPL2
 # 
 # See: https://github.com/edrx/emlua
@@ -232,6 +232,25 @@ PPPV(EdrxEmacsRepl.__index)
 At this moment ~emlua~ isn't very useful /per se/, but it is very easy
 to hack and extend.
 
+
+* Ideas
+
+In Agda the same symbol can have different meanings depending on the
+context, and the key @@html:<kbd>M-,</kbd>@@ can be used to go the
+source code of the symbol at point. This is implemented by storing the
+location of the source of each symbol in a buffer in its [[http://www.gnu.org/software/emacs/manual/html_node/elisp/Text-Properties.html][text
+properties]]. See the screenshot below (click to enlarge it):
+
+@@html:<a href="2022agda-mode-prop.png"><IMG SRC="2022agda-mode-prop-small.png"></a>@@
+
+The function [[http://angg.twu.net/emlua/emlua-repl.el.html#emlua-dostring+][~emlua-dostring+~]] in ~emlua-repl.el~ executes Lua code
+and interprets the result as elisp code to be executed by Emacs. We
+can use it to generate text with properties, and we can use
+~eepitch-emlua~ to develop interactively the Lua functions that we
+will call using ~emlua-dostring+~.
+
+Emacs can display SVG images - see the packages [[https://elpa.gnu.org/packages/svg.html][svg]] and [[https://github.com/dalanicolai/sketch-mode][sketch-mode]] -
+and we can use ~emlua-dostring+~ to create and modify SVG images.
 
 
 
