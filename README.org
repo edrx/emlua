@@ -10,8 +10,14 @@
 # Version: 2022mar28
 # License: GPL2
 # 
-# See: <https://github.com/edrx/emlua>.
+# See: <https://github.com/edrx/emlua>,
+#      <https://github.com/edrx/emlua#introduction>.
 # 
+# Announcements:
+#   https://lists.gnu.org/archive/html/emacs-devel/2022-03/msg00767.html
+#   https://lists.gnu.org/archive/html/eev/2022-03/msg00004.html
+#   http://lua-users.org/lists/lua-l/2022-03/msg00098.html 
+#
 # Some eev-isms:
 # (defun c  () (interactive) (eek "C-c C-e h h"))
 # (defun o  () (interactive) (find-angg "emlua/README.org"))

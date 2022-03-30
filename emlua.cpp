@@ -8,7 +8,7 @@
 //          <eduardoochs@gmail.com> (all the rest).
 // See: http://lua-users.org/lists/lua-l/2021-03/msg00084.html
 //      https://lists.gnu.org/archive/html/emacs-devel/2021-04/msg00907.html
-// Version: 2022mar25
+// Version: 2022mar30
 // License: GPL2
 //
 // See: <https://github.com/edrx/emlua>.
@@ -110,6 +110,12 @@ int emacs_module_init(struct emacs_runtime *ert) noexcept
 	emacs_value symbol = env->intern(env, "emlua-dostring");
 	emacs_value args[] = {symbol, func};
 	env->funcall(env, env->intern(env, "defalias"), 2, args);
+
+	// The next three lines were suggested by bpalmer
+	env->intern(env, "emlua");
+	emacs_value provide_args[] = {symbol};
+	env->funcall(env, env->intern(env, "provide"), 1, provide_args);
+
 	return 0;
 }
 } // extern "C"
@@ -130,7 +136,7 @@ cd      /tmp/emlua/
 git clone https://github.com/edrx/emlua .
 make clean
 make
-# make EMACS_DIR=$HOME/usrc/emacs29
+make EMACS_DIR=$HOME/usrc/emacs29
 
 # (load "/tmp/emlua/emlua.so")
 # (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
@@ -152,7 +158,12 @@ cd ~/emlua/
 make clean
 make EMACS_DIR=$HOME/usrc/emacs29
 
+# (add-to-list 'load-path "~/emlua/")
+# (require 'emlua)
+
+# Or:
 # (load (ee-expand "~/emlua/emlua.so"))
+
 # (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
 # (emlua-dostring "err")
 
