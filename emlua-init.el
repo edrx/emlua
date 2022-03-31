@@ -5,15 +5,16 @@
 ;; https://raw.githubusercontent.com/edrx/emlua/main/emlua-init.el
 ;;           https://github.com/edrx/emlua/blob/main/emlua-init.el
 ;; Author: Eduardo Ochs <eduardoochs@gmail.com>
-;; Version: 2022mar27
+;; Version: 2022mar30
 ;; License: GPL2
 ;;
 ;; See: https://github.com/edrx/emlua
 
 
 
-;; Based on:
-;; (find-eev "eev-beginner.el" "load-path-hack")
+;; Based on: (find-eev "eev-beginner.el" "load-path-hack")
+;; Test:     emlua-dir
+;;
 (setq emlua-dir
       (if load-in-progress
 	  (file-name-directory load-file-name)
@@ -27,10 +28,12 @@
 (defun emlua-init-so-0 ()
   (concat emlua-dir "emlua.so"))
 
-(defun emlua-init-so ()
-  (if (not (fboundp 'emlua-dostring))
-      (load (emlua-init-so-0))
-    "emlua.so already loaded"))
+(defun emlua-init-so (&optional use-load-instead-of-require)
+  (if (fboundp 'emlua-dostring)
+      "emlua.so already loaded"
+    (if use-load-instead-of-require
+	(load (emlua-init-so-0))
+      (require 'emlua (emlua-init-so-0)))))
 
 
 
@@ -63,8 +66,8 @@
 
 ;; Test: (emlua-init)
 ;;
-(defun emlua-init ()
-  (list (emlua-init-so)
+(defun emlua-init (&optional use-load-instead-of-require)
+  (list (emlua-init-so       use-load-instead-of-require)
         (emlua-init-dofiles)
         (emlua-init-newrepl)))
         

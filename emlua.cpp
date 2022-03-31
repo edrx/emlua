@@ -130,7 +130,9 @@ make clean
 make
 make EMACS_DIR=$HOME/usrc/emacs29
 
-# (load "/tmp/emlua/emlua.so")
+# (require 'emlua "/tmp/emlua.so")
+# Or:       (load "/tmp/emlua.so")
+
 # (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
 # (emlua-dostring "err")
 
@@ -150,11 +152,8 @@ cd ~/emlua/
 make clean
 make EMACS_DIR=$HOME/usrc/emacs29
 
-# (add-to-list 'load-path "~/emlua/")
-# (require 'emlua)
-
-# Or:
-# (load (ee-expand "~/emlua/emlua.so"))
+# (require 'emlua "~/emlua/emlua.so")
+# Or:       (load "~/emlua/emlua.so")
 
 # (emlua-dostring "a = a and a+1 or 0; return 22+33, '44', {}, a, nil")
 # (emlua-dostring "err")
